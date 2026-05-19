@@ -5,92 +5,17 @@ config = ConfiguracionSimulacion()
 
 sim = Simulador(config)
 
-# =====================================
-# INICIALIZAR
-# =====================================
+sim.simular()
 
-sim.inicializar_simulacion()
+for fila in sim.tabla_estado:
 
-# =====================================
-# PROCESAR UNA LLEGADA
-# =====================================
+    print()
 
-for i in range(10):
+    for clave, valor in fila.items():
+
+        print(f"{clave}: {valor}")
 
 
-      evento, hora, tipo = (
-            sim.buscar_proximo_evento()
-      )
+print(f" HOLAAAAAAAA " , len(sim.tabla_estado))
 
-      sim.avanzar_reloj(hora)
 
-      print("\n=========================")
-      print(f"ITERACIÓN {sim.iteracion}")
-      print("=========================")
-
-      print("Evento:", evento)
-
-      print("Reloj:", sim.reloj)
-
-    # =========================
-    # LLEGADA
-    # =========================
-
-      if evento == "Llegada Paciente":
-            sim.procesar_llegada()
-
-    # =========================
-    # FIN VACUNACIÓN
-    # =========================
-
-      elif evento == "Fin Vacunacion":
-
-            sim.procesar_fin_vacunacion(
-                  tipo
-            )
-      elif evento == "Fin Observacion":
-            sim.procesar_fin_observacion(tipo)
-
-    # =========================
-    # ESTADO SISTEMA
-    # =========================
-
-      print()
-
-      for s in sim.servidores:
-
-            print(
-
-                  f"Servidor {s.id}: "
-                  f"{s.estado}"
-            )
-
-            if s.paciente_actual is not None:
-
-                  print(
-                  f"Paciente actual: "
-                  f"{s.paciente_actual.id}"
-                  )
-
-                  print(
-                  f"Fin vacunación: "
-                  f"{s.fin_vacunacion}"
-                  )
-
-      print()
-
-      print(
-
-            "Cola espera:",
-            len(sim.cola_espera)
-      )
-
-      print(
-            "Observación:",
-            len(sim.zona_observacion)
-      )
-
-      print(
-            "No ingresan:",
-            sim.cantidad_no_ingresan
-      )

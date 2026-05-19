@@ -4,7 +4,7 @@ class ConfiguracionSimulacion:
         self,
 
         # Llegadas (Exponencial)
-        media_llegadas=2,
+        media_llegadas=6,
 
         # Vacunación (Uniforme)
         vacunacion_min=3,
@@ -19,8 +19,8 @@ class ConfiguracionSimulacion:
         
 
         # Simulación
-        tiempo_simulacion=1000,
-        max_iteraciones=100000,
+        tiempo_simulacion=30,
+        max_iteraciones=100,
 
         # Visualización del vector
         mostrar_desde_iteracion=0,
