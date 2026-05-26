@@ -247,7 +247,7 @@ class Simulador:
 
         self.zona_observacion.append(paciente)
 
-        # LIBERAR SERVIDOR
+        
     
         
     
@@ -620,9 +620,62 @@ class Simulador:
                 else None
             )
 
-        # PACIENTES EN OBSERVACIÓN
+        # SEGUIMIENTO DE PACIENTES
+        pacientes_sistema = []
 
-        fila["Pacientes Observacion"] = [paciente.id for paciente in self.zona_observacion]
+        for paciente in self.cola_espera:
+            pacientes_sistema.append(paciente)
+
+        #Paciente vacunandose
+        for servidor in self.servidores:
+
+            if servidor.paciente_actual is not None:
+
+                pacientes_sistema.append(servidor.paciente_actual)
+        
+        #Paciente observacion
+        for paciente in self.zona_observacion:
+
+            pacientes_sistema.append(paciente)
+
+        
+        # COLUMNAS PACIENTES
+
+
+        for i, paciente in enumerate(pacientes_sistema,start=1):
+            # DATOS BÁSICOS
+            fila[f"Paciente {i} ID"] = (paciente.id)
+
+            fila[f"Paciente {i} Estado"] = (paciente.estado)
+
+            fila[f"Paciente {i} Hora Llegada"] = (round(paciente.hora_llegada,3))
+
+    
+        # VACUNÁNDOSE
+   
+
+            if paciente.estado == "Vacunandose":
+                fila[f"Paciente {i} Fin Vacunacion"] = (round(paciente.hora_fin_vacunacion,3))
+
+                fila[f"Paciente {i} Fin Observacion"] = None
+
+    
+        # OBSERVACIÓN
+    
+            elif paciente.estado == "Observacion":
+
+                fila[f"Paciente {i} Fin Vacunacion"] = None
+
+                fila[f"Paciente {i} Fin Observacion"] = (round(paciente.hora_fin_observacion,3))
+
+    
+        # ESPERANDO
+    
+
+            else:
+                fila[f"Paciente {i} Fin Vacunacion"] = None
+
+                fila[f"Paciente {i} Fin Observacion"] = None
 
         # GUARDAR FILA
         self.tabla_estado.append(fila)
