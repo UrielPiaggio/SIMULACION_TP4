@@ -63,6 +63,9 @@ class Simulador:
         self.tabla_estado = []
         # Control simulacion
         self.iteracion = 0
+        self.promedio_permanencia = 0
+        self.porcentaje_rechazo = 0
+        self.promedio_bloqueo = 0
 
     #EVENTO DE INICILIZACION
     def inicializar_simulacion(self):
