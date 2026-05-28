@@ -124,40 +124,110 @@ async function cargarResultados() {
 function renderizarTabla(vector) {
     const thead = document.getElementById('tabla-head');
     const tbody = document.getElementById('tabla-body');
-    const tfoot = document.getElementById('tabla-foot'); // Me guardo los ids de la cabecera el cuerpo y el pie de la tabla
+    const tfoot = document.getElementById('tabla-foot');
+    
     thead.innerHTML = '';
     tbody.innerHTML = '';
+    if (tfoot) tfoot.innerHTML = '';
 
     if (vector.length === 0) return;
-    if (tfoot) tfoot.innerHTML = ''; // Limpiamos el pie de la tabla asi se renueva con cada simulacion
 
-    // Crear cabeceras basadas en las claves del primer objeto
-    const headers = Object.keys(vector[0]);
-    let trHead = document.createElement('tr');
-    headers.forEach(h => {
+    // 1. SEPARAR COLUMNAS GENERALES DE LAS DE PACIENTES
+    const todasLasKeys = Object.keys(vector[0]);
+    // Filtramos las llaves que empiezan con "P1_", "P2_", etc.
+    const keysPacientes = todasLasKeys.filter(k => /^P\d+_/.test(k));
+    // El resto son datos generales de la simulación
+    const keysGenerales = todasLasKeys.filter(k => !/^P\d+_/.test(k));
+
+    // Calcular cuántos bloques de pacientes hay (si el máximo en python fue 15, serán 15)
+    // Cada paciente tiene 5 campos (ID, Estado, Llegada, FinVac, FinObs)
+    const totalColumnasPacientes = keysPacientes.length;
+
+    // --- FILA 1: SUPER-CABECERA ---
+    const trSuper = document.createElement('tr');
+
+    // Celda vacía/azul para los datos generales
+    const thGralSuper = document.createElement('th');
+    thGralSuper.colSpan = keysGenerales.length;
+    thGralSuper.className = "px-4 py-2 text-center bg-blue-200 text-blue-900 border-b font-bold";
+    thGralSuper.textContent = "Datos de Simulación";
+    trSuper.appendChild(thGralSuper);
+
+    // Celda naranja/roja gigante para "Seguimiento pacientes" (estilo Excel de la imagen)
+    const thPacientesSuper = document.createElement('th');
+    thPacientesSuper.colSpan = totalColumnasPacientes;
+    thPacientesSuper.className = "px-4 py-3 text-center bg-orange-700 text-white border-b font-bold uppercase tracking-wider text-base";
+    thPacientesSuper.textContent = "Seguimiento pacientes";
+    trSuper.appendChild(thPacientesSuper);
+    
+    thead.appendChild(trSuper);
+
+    // --- FILA 2: SUB-CABECERA (Nombres de las columnas individuales) ---
+    const trSub = document.createElement('tr');
+
+    // Sub-cabeceras generales
+    keysGenerales.forEach(k => {
         let th = document.createElement('th');
-        th.className = "px-4 py-3 font-semibold border-b whitespace-nowrap";
-        th.textContent = h;
-        trHead.appendChild(th);
+        th.className = "px-4 py-2 font-semibold border-b border-r bg-blue-100 text-blue-900 whitespace-nowrap text-xs text-center";
+        th.textContent = k;
+        trSub.appendChild(th);
     });
-    thead.appendChild(trHead);
 
-    // Crear filas
+    // Sub-cabeceras de pacientes (Limpia el "P1_")
+    keysPacientes.forEach(k => {
+        let th = document.createElement('th');
+        // Identificar qué propiedad es (ID, Estado, Llegada, etc.)
+        let nombreLimpio = k.replace(/^P\d+_/, '');
+        
+        // Estilo visual para separar visualmente los bloques de pacientes (borde derecho más grueso al final de cada paciente)
+        let esFinBloque = nombreLimpio === "FinObs";
+        th.className = `px-2 py-2 font-semibold border-b text-center whitespace-nowrap text-xs bg-gray-100 text-gray-700 ${esFinBloque ? 'border-r-2 border-r-gray-400' : 'border-r'}`;
+        
+        th.textContent = nombreLimpio;
+        trSub.appendChild(th);
+    });
+
+    thead.appendChild(trSub);
+
+    // --- CUERPO DE LA TABLA (FILAS DE DATOS) ---
     vector.forEach((fila, index) => {
         let tr = document.createElement('tr');
         let esUltimaFila = (index === vector.length - 1);
 
         if (esUltimaFila) {
-            // Ya no hace falta ponerle estilos de fondo aquí, porque los maneja el tfoot contenedor
-            tr.className = "text-blue-900"; 
+            tr.className = "bg-blue-50 font-bold text-blue-900"; 
         } else {
-            tr.className = "hover:bg-gray-50";
+            tr.className = "hover:bg-gray-50 odd:bg-white even:bg-gray-50/50";
         }
 
-        headers.forEach(h => {
+        // Renderizar celdas generales
+        keysGenerales.forEach(k => {
             let td = document.createElement('td');
-            td.className = "px-4 py-2 border-b whitespace-nowrap";
-            td.textContent = fila[h] !== null ? fila[h] : '-';
+            td.className = "px-4 py-2 border-b border-r text-center whitespace-nowrap";
+            td.textContent = fila[k] !== null ? fila[k] : '-';
+            tr.appendChild(td);
+        });
+
+        // Renderizar celdas de pacientes
+        keysPacientes.forEach(k => {
+            let td = document.createElement('td');
+            let nombreLimpio = k.replace(/^P\d+_/, '');
+            let esFinBloque = nombreLimpio === "FinObs";
+            
+            td.className = `px-2 py-1 border-b text-center whitespace-nowrap text-xs ${esFinBloque ? 'border-r-2 border-r-gray-400' : 'border-r'}`;
+            
+            let valor = fila[k];
+            // Si el valor es null (columna vacía porque no hay paciente asignado), se dibuja vacío como el Excel
+            td.textContent = (valor !== null && valor !== undefined) ? valor : '';
+            
+            // Opcional: Color tenue si la celda tiene datos de un paciente para destacar sobre el vacío
+            if (fila[k] !== null && fila[k] !== undefined) {
+                if (nombreLimpio === "Estado") {
+                    if (valor === "Vacunandose") td.classList.add("text-green-600", "font-medium");
+                    if (valor === "Observacion") td.classList.add("text-amber-600", "font-medium");
+                }
+            }
+
             tr.appendChild(td);
         });
 
@@ -166,7 +236,6 @@ function renderizarTabla(vector) {
         } else {
             tbody.appendChild(tr);
         }
-
     });
 }
 

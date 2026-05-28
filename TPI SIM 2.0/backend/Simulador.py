@@ -67,6 +67,8 @@ class Simulador:
         self.porcentaje_rechazo = 0
         self.promedio_bloqueo = 0
 
+        self.posiciones_pacientes = {}
+
     #EVENTO DE INICILIZACION
     def inicializar_simulacion(self):
 
@@ -642,49 +644,56 @@ class Simulador:
         # COLUMNAS PACIENTES
 
 
-        for i, paciente in enumerate(pacientes_sistema,start=1):
-            # DATOS BÁSICOS
-            fila[f"Paciente {i} ID"] = (paciente.id)
+        # --- LÓGICA DE COLUMNAS FIJAS (REUTILIZABLES) ---
+        
+        # 1. Identificar IDs de pacientes que siguen en el sistema
+        ids_actuales = [p.id for p in pacientes_sistema]
 
-            fila[f"Paciente {i} Estado"] = (paciente.estado)
+        # 2. Limpiar del mapeador a los que ya se fueron (libera la columna)
+        ids_a_borrar = [pid for pid in self.posiciones_pacientes if pid not in ids_actuales]
+        for pid in ids_a_borrar:
+            del self.posiciones_pacientes[pid]
 
-            fila[f"Paciente {i} Hora Llegada"] = (round(paciente.hora_llegada,3))
+        # 3. Asignar columna a los nuevos que entraron
+        for p in pacientes_sistema:
+            if p.id not in self.posiciones_pacientes:
+                # Busca el primer número de columna (1, 2, 3...) que esté libre
+                col_libre = 1
+                while any(c == col_libre for c in self.posiciones_pacientes.values()):
+                    col_libre += 1
+                self.posiciones_pacientes[p.id] = col_libre
 
-    
-        # VACUNÁNDOSE
-   
+        # 4. Llenar la fila con las columnas (ejemplo: capacidad para 10 columnas visibles)
+        # Esto asegura que la Columna 1 sea siempre la misma en el Excel/Tabla
+        max_columnas_visibles = 15 
+        for i in range(1, max_columnas_visibles + 1):
+            # Ver si hay algún paciente asignado a esta columna 'i'
+            id_en_esta_col = next((pid for pid, c in self.posiciones_pacientes.items() if c == i), None)
+            
+            p_data = next((p for p in pacientes_sistema if p.id == id_en_esta_col), None)
 
-            if paciente.estado == "Vacunandose":
-                fila[f"Paciente {i} Fin Vacunacion"] = (round(paciente.hora_fin_vacunacion,3))
-
-                fila[f"Paciente {i} Fin Observacion"] = None
-
-    
-        # OBSERVACIÓN
-    
-            elif paciente.estado == "Observacion":
-
-                fila[f"Paciente {i} Fin Vacunacion"] = None
-
-                fila[f"Paciente {i} Fin Observacion"] = (round(paciente.hora_fin_observacion,3))
-
-    
-        # ESPERANDO
-    
-
+            if p_data:
+                fila[f"P{i}_ID"] = p_data.id
+                fila[f"P{i}_Estado"] = p_data.estado
+                fila[f"P{i}_Llegada"] = round(p_data.hora_llegada, 2)
+                
+                if p_data.estado == "Vacunandose":
+                    fila[f"P{i}_FinVac"] = round(p_data.hora_fin_vacunacion, 2)
+                    fila[f"P{i}_FinObs"] = None
+                elif p_data.estado == "Observacion":
+                    fila[f"P{i}_FinVac"] = None
+                    fila[f"P{i}_FinObs"] = round(p_data.hora_fin_observacion, 2)
+                else:
+                    fila[f"P{i}_FinVac"] = None
+                    fila[f"P{i}_FinObs"] = None
             else:
-                fila[f"Paciente {i} Fin Vacunacion"] = None
+                # Columna vacía (paciente se fue o nunca hubo)
+                fila[f"P{i}_ID"] = None
+                fila[f"P{i}_Estado"] = None
+                fila[f"P{i}_Llegada"] = None
+                fila[f"P{i}_FinVac"] = None
+                fila[f"P{i}_FinObs"] = None
 
-                fila[f"Paciente {i} Fin Observacion"] = None
-
-        # GUARDAR FILA
-         #inicio = self.config.mostrar_desde_iteracion
-
-        #fin = (inicio + self.config.cantidad_iteraciones_mostrar)
-
-        #if inicio <= self.iteracion < fin:
-            # GUARDAR FILA
-          #  self.tabla_estado.append(fila)
         self.tabla_estado.append(fila)
     
 
