@@ -124,10 +124,12 @@ async function cargarResultados() {
 function renderizarTabla(vector) {
     const thead = document.getElementById('tabla-head');
     const tbody = document.getElementById('tabla-body');
+    const tfoot = document.getElementById('tabla-foot'); // Me guardo los ids de la cabecera el cuerpo y el pie de la tabla
     thead.innerHTML = '';
     tbody.innerHTML = '';
 
     if (vector.length === 0) return;
+    if (tfoot) tfoot.innerHTML = ''; // Limpiamos el pie de la tabla asi se renueva con cada simulacion
 
     // Crear cabeceras basadas en las claves del primer objeto
     const headers = Object.keys(vector[0]);
@@ -143,9 +145,14 @@ function renderizarTabla(vector) {
     // Crear filas
     vector.forEach((fila, index) => {
         let tr = document.createElement('tr');
-        // Resaltar la última fila (Momento X)
-        if (index === vector.length - 1) tr.className = "bg-blue-50 font-semibold";
-        else tr.className = "hover:bg-gray-50";
+        let esUltimaFila = (index === vector.length - 1);
+
+        if (esUltimaFila) {
+            // Ya no hace falta ponerle estilos de fondo aquí, porque los maneja el tfoot contenedor
+            tr.className = "text-blue-900"; 
+        } else {
+            tr.className = "hover:bg-gray-50";
+        }
 
         headers.forEach(h => {
             let td = document.createElement('td');
@@ -153,7 +160,13 @@ function renderizarTabla(vector) {
             td.textContent = fila[h] !== null ? fila[h] : '-';
             tr.appendChild(td);
         });
-        tbody.appendChild(tr);
+
+        if (esUltimaFila && tfoot) {
+            tfoot.appendChild(tr);
+        } else {
+            tbody.appendChild(tr);
+        }
+
     });
 }
 
