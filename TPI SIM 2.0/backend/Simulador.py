@@ -236,7 +236,7 @@ class Simulador:
             # BLOQUEAR SERVIDOR
 
             servidor.bloquear(self.reloj)
-            print("BLOQUEO EN FI VACUNACIOON")
+            
 
             self.cantidad_bloqueos += 1
 
@@ -363,7 +363,7 @@ class Simulador:
                     servidor.inicio_bloqueo = None
                     servidor.paciente_actual = None
                     servidor.ocupar(siguiente_paciente, hora_fin_vac)
-                    print("FIN DESBLOQUEADO OBSERVACION OCUPPADO")
+                    
 
             
                     # SI NO HAY COLA
@@ -374,7 +374,7 @@ class Simulador:
                     self.rnd_vacunacion = None
                     self.tiempo_vacunacion = None
                     self.fin_vacunacion_generado = None
-                    print("BLOqueado pasado a liberado")
+                    
     
 
     
@@ -461,7 +461,7 @@ class Simulador:
 
             self.promedio_bloqueo = 0
 
-        print("\nFIN SIMULACIÓN EJECUTADO")
+        
 
 
     
@@ -514,13 +514,7 @@ class Simulador:
             #Siguiente Iteracion
             self.iteracion += 1
             
-            print("\n=========================")
-            print(f"ITERACIÓN {self.iteracion}")
-            print("=========================")
-
-            print("Evento:", evento)
-
-            print("Reloj:", self.reloj)
+          
 
 
     
@@ -684,6 +678,13 @@ class Simulador:
                 fila[f"Paciente {i} Fin Observacion"] = None
 
         # GUARDAR FILA
+         #inicio = self.config.mostrar_desde_iteracion
+
+        #fin = (inicio + self.config.cantidad_iteraciones_mostrar)
+
+        #if inicio <= self.iteracion < fin:
+            # GUARDAR FILA
+          #  self.tabla_estado.append(fila)
         self.tabla_estado.append(fila)
     
 

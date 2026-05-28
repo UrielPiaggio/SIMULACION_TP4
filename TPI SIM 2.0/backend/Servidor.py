@@ -40,7 +40,7 @@ class ServidorVacunacion:
     def ocupar(self, paciente, hora_fin_vacunacion):
 
         self.estado = "Ocupado"
-        print(self.id)
+        
 
         self.paciente_actual = paciente
 
