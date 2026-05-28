@@ -236,6 +236,7 @@ class Simulador:
             # BLOQUEAR SERVIDOR
 
             servidor.bloquear(self.reloj)
+            print("BLOQUEO EN FI VACUNACIOON")
 
             self.cantidad_bloqueos += 1
 
@@ -362,6 +363,7 @@ class Simulador:
                     servidor.inicio_bloqueo = None
                     servidor.paciente_actual = None
                     servidor.ocupar(siguiente_paciente, hora_fin_vac)
+                    print("FIN DESBLOQUEADO OBSERVACION OCUPPADO")
 
             
                     # SI NO HAY COLA
@@ -372,6 +374,7 @@ class Simulador:
                     self.rnd_vacunacion = None
                     self.tiempo_vacunacion = None
                     self.fin_vacunacion_generado = None
+                    print("BLOqueado pasado a liberado")
     
 
     

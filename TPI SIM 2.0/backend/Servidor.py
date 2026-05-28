@@ -40,6 +40,7 @@ class ServidorVacunacion:
     def ocupar(self, paciente, hora_fin_vacunacion):
 
         self.estado = "Ocupado"
+        print(self.id)
 
         self.paciente_actual = paciente
 
@@ -60,6 +61,9 @@ class ServidorVacunacion:
         self.estado = "Bloqueado"
 
         self.inicio_bloqueo = reloj_actual
+
+        # La vacunación YA terminó
+        self.fin_vacunacion = None
 
     def __str__(self):
 
