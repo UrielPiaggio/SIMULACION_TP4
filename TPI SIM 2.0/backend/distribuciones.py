@@ -5,7 +5,6 @@ import math
 def distribucion_exponencial(media):
     # Generamos el random. Si llega a ser 1.0, lo ajustamos
     rnd = random.random()
-    print("Random generado (antes de ajuste):", rnd)
     if rnd >= 0.999:
         rnd = 0.999 # O simplemente un valor que evite el log(0)
     
