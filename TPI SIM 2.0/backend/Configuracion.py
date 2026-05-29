@@ -1,28 +1,26 @@
+# Clase que centraliza todos los parametros de la simulacion para que sea facil twekearlos
+
 class ConfiguracionSimulacion:
+
+# Este constructor recibe una banda de parametros pero don't worry son razonables
+# media_llegadas es la media de la distribucion exponencial negativa que determina como llegan los pacientes al lugar (los clientes al servidor digamo)
+# vacunacion_min y vacunacion_max son los valores A y B que definen mediante una distribucion uniforme los tiempos que se demora en vacunar a un paciente
+# tiempo_observacion es el tiempo que tiene que pasar el paciente en una zona de observacion y es un int 
+# capacidad_cola_externa es el tamaño de la cola de espera de afuera, seria del servidor de vacunacion
+# capacidad_observacion es el tamaño de la zona de observacion
+# tiempo_simulacion y max_iteraciones son parametros de corte de la simulacion, al que se llegue primero se termina la simulacion
+# mostrar_desde_iteracion y cantidad_iteraciones_mostrar son para ver el vector estado en el resultado de la simulacion
 
     def __init__(
         self,
-
-        # Llegadas (Exponencial)
         media_llegadas=6,
-
-        # Vacunación (Uniforme)
         vacunacion_min=3,
         vacunacion_max=7,
-
-        # Observación
         tiempo_observacion=1,
-
-        # Capacidades
         capacidad_cola_externa=10,
         capacidad_observacion=1,
-        
-
-        # Simulación
         tiempo_simulacion=30,
         max_iteraciones=100,
-
-        # Visualización del vector
         mostrar_desde_iteracion=0,
         cantidad_iteraciones_mostrar=100
     ):
@@ -60,6 +58,7 @@ class ConfiguracionSimulacion:
         self.mostrar_desde_iteracion = mostrar_desde_iteracion
         self.cantidad_iteraciones_mostrar = cantidad_iteraciones_mostrar
 
+# metodo q imprime todos los parametros almacenados de arriba en una forma legible
     def mostrar_configuracion(self):
 
         print("\n===== CONFIGURACIÓN =====")
